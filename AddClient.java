@@ -16,6 +16,7 @@ public class AddClient {
 
             final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
             final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\SombrinhasDisp.txt";
+
             File fileUserPass = new File(pathUserPass);
             File fileSombrinhas = new File(pathsombrinhas);
             BufferedWriter bf;
@@ -28,41 +29,67 @@ public class AddClient {
                 temConta = myObj.nextLine();
 
                 if (temConta.equals("n")) {
-                    System.out.println("Por favor, faça o registo");
+                    System.out.println("Por favor, faça o registo.");
 
                     do {
 
-                        System.out.println("\n" + "Insira o seu email:");
+                        System.out.println("Insira o seu email:");
                         email = myObj.nextLine();
 
-                        System.out.println("\n" + "Insira a sua password:");
+                        System.out.println("Insira a sua password:");
                         password = myObj.nextLine();
 
-                        System.out.println("\n" + "Repita a sua password:");
+                        System.out.println("Repita a sua password:");
                         passwordRepetida = myObj.nextLine();
 
-                        if (!password.equals(passwordRepetida)) {
-                            System.out.println("\n" + "Passwords incorretas");
+                        if(email.contains(",")){
+
+                            System.out.println("Email não pode conter uma vígula.");
+
+                        }else if(password.contains(",")){
+
+                            System.out.println("Password não pode conter uma vígula.");
+
+                        }else if (!password.equals(passwordRepetida)) {
+
+                            System.out.println("Passwords não são iguais.");
 
                         } else {
-                            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass))) {
+                            String ultimoID = "";
+
+                            try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
+
+                                String linha;
+
+                                while ((linha = leitor.readLine()) != null) {
+
+                                    String[] userPass = linha.split(",");
+                                    ultimoID = userPass[0];
+
+                                }
+                            }
+
+                            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass, true))) {
+
+                                int id = Integer.parseInt(ultimoID);
+                                id++;
+
+                                escritor.write(id + "," +email + "," + password);
                                 escritor.newLine();
-                                escritor.write(email + "," + password);
                             }
                         }
 
-                    } while (!password.equals(passwordRepetida));
+                    } while (!password.equals(passwordRepetida) || email.contains(",") || password.contains(","));
 
 
                 } else if (temConta.equals("s")) {
                     boolean logado = false;
-                    boolean ultimo = false;
 
                     do {
-                        System.out.println("\n" + "Insira o seu email:");
+                        System.out.println("Insira o seu email:");
                         email = myObj.nextLine();
 
-                        System.out.println("\n" + "Insira a sua password:");
+                        System.out.println("Insira a sua password:");
                         password = myObj.nextLine();
 
                         try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
@@ -72,9 +99,9 @@ public class AddClient {
                             while ((linha = leitor.readLine()) != null) {
 
                                 String[] userPass = linha.split(",");
-                                if (userPass[0].equals(email)) {
+                                if (userPass[1].equals(email)) {
 
-                                    if (userPass[1].equals(password)) {
+                                    if (userPass[2].equals(password)) {
                                         logado = true;
                                     }
 
