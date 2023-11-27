@@ -1,83 +1,177 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.rmi.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class AddClient {
-  public static void main(String[] args) {
-    try {
+    public static void main(String[] args) {
+        try {
       /*
       String addServerURL = "rmi://" + args[0] + "/AddServer";
       AddServerIntf addServerIntf =
                     (AddServerIntf)Naming.lookup(addServerURL);
       */
-      Scanner myObj = new Scanner(System.in);
-      String temConta, email, password, passwordRepetida;
+            Scanner myObj = new Scanner(System.in);
+            String temConta, email, password, passwordRepetida, opcao;
 
-      final String outputFilePath = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
-      File file = new File(outputFilePath);
-      BufferedWriter bf;
-
-
-      System.out.println("Bem vindo!\n" + "\n" + "Já tem conta? (s/n)");
-
-      do{
-
-        temConta = myObj.nextLine();
-
-        if(temConta.equals("n")){
-          System.out.println("Por favor, faça o registo");
-
-          do{
-
-            System.out.println("\n"+"Insira o seu email:");
-            email = myObj.nextLine();
-
-            System.out.println("\n"+"Insira a sua password:");
-            password = myObj.nextLine();
-
-            System.out.println("\n"+"Repita a sua password:");
-            passwordRepetida = myObj.nextLine();
-
-            if(!password.equals(passwordRepetida)){
-              System.out.println("\n"+"Passwords incorretas");
-
-            }else{
-              BufferedWriter escritor = new BufferedWriter(new FileWriter(file));
-              escritor.write(email + "," + password);
-            }
-
-          }while (!password.equals(passwordRepetida));
+            final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
+            final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\SombrinhasDisp.txt";
+            File fileUserPass = new File(pathUserPass);
+            File fileSombrinhas = new File(pathsombrinhas);
+            BufferedWriter bf;
 
 
+            System.out.println("Bem vindo!\n" + "\n" + "Já tem conta? (s/n)");
 
-        } else if (temConta.equals("s")) {
+            do {
 
-          System.out.println("\n"+"Insira o seu email:");
-          email = myObj.nextLine();
+                temConta = myObj.nextLine();
 
-          System.out.println("\n"+"Insira a sua password:");
-          password = myObj.nextLine();
+                if (temConta.equals("n")) {
+                    System.out.println("Por favor, faça o registo");
+
+                    do {
+
+                        System.out.println("\n" + "Insira o seu email:");
+                        email = myObj.nextLine();
+
+                        System.out.println("\n" + "Insira a sua password:");
+                        password = myObj.nextLine();
+
+                        System.out.println("\n" + "Repita a sua password:");
+                        passwordRepetida = myObj.nextLine();
+
+                        if (!password.equals(passwordRepetida)) {
+                            System.out.println("\n" + "Passwords incorretas");
+
+                        } else {
+                            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass))) {
+                                escritor.newLine();
+                                escritor.write(email + "," + password);
+                            }
+                        }
+
+                    } while (!password.equals(passwordRepetida));
+
+
+                } else if (temConta.equals("s")) {
+                    boolean logado = false;
+                    boolean ultimo = false;
+
+                    do {
+                        System.out.println("\n" + "Insira o seu email:");
+                        email = myObj.nextLine();
+
+                        System.out.println("\n" + "Insira a sua password:");
+                        password = myObj.nextLine();
+
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
+
+                            String linha;
+
+                            while ((linha = leitor.readLine()) != null) {
+
+                                String[] userPass = linha.split(",");
+                                if (userPass[0].equals(email)) {
+
+                                    if (userPass[1].equals(password)) {
+                                        logado = true;
+                                    }
+
+                                }
+
+                            }
+
+
+                            if(logado){
+                                System.out.println("Login feito com sucesso!");
+                            }else{
+                                System.out.println("Credencias erradas!");
+                            }
+
+                        }
+                    } while (!logado);
+
+
+                } else {
+
+                    System.out.println("Valores incorretos, por favor introduza outra vez");
+
+                }
+
+            } while (!temConta.equals("n") && !temConta.equals("s"));
+
+            do {
+                System.out.println("\n" + "Escolha uma opção:" + "\n" + "R - Reservar uma sombrinha" + "\n" + "L - Listar sombrinhas não reservadas" + "\n" + "C - Cancelar uma sombrinha reservada");
+                opcao = myObj.nextLine();
+
+                if (opcao.equals("R")) {
+                    int y = 1;
+                    String letra, hora, num;
+                    int hora_inicio, num_pessoas;
+
+                    do {
+                        System.out.println("Escolha a praia:");
+                        letra = myObj.nextLine();
+
+                    } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+
+
+                    do{
+                        System.out.println("Escolha a hora de ínicio(8h - 20h)");
+                        hora = myObj.nextLine();
+                        hora_inicio = Integer.parseInt(hora);
+
+                    }while(hora_inicio < 8 && hora_inicio > 20 );
+
+                    do{
+                        System.out.println("Escolha o número de pessoas (1-4)");
+                        num = myObj.nextLine();
+                        num_pessoas = Integer.parseInt(num);
+
+                    }while(num_pessoas < 1 && num_pessoas > 4);
+
+                    if(num_pessoas >= 1 && num_pessoas <= 2){
+
+                    }else if(num_pessoas == 3){
+
+                    }else if(num_pessoas == 4){
+
+                    }
 
 
 
-        }else{
 
-          System.out.println("Valores incorretos, por favor introduza outra vez");
 
+
+                } else if (opcao.equals("L")) {
+                    try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
+                        String linha;
+                        while ((linha = leitor.readLine()) != null) {
+                            String[] praias = linha.split(",");
+                            if (praias[2].equals("N")) {
+                                System.out.println(linha);
+                            }
+                        }
+                    }
+                } else if (opcao.equals("C")) {
+                    String letra;
+                    do{
+
+                        System.out.println("Escolha a praia (A,B,C)");
+                        letra = myObj.nextLine();
+
+                    }while(letra != "A" && letra != "B" && letra != "C");
+
+                } else {
+                    System.out.println("Escola uma opção correta");
+                }
+            } while (!opcao.equals("R") || !opcao.equals("L") || !opcao.equals("C"));
+
+
+            // System.out.println("The sum is: " + addServerIntf.add(1, 2));
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
         }
-
-      }while(!temConta.equals("n") && !temConta.equals("s"));
-
-
-
-
-     // System.out.println("The sum is: " + addServerIntf.add(1, 2));
     }
-    catch(Exception e) {
-      System.out.println("Exception: " + e);
-    }
-  }
 }
