@@ -1,3 +1,5 @@
+package ServerClient;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,19 +11,14 @@ import java.util.stream.Stream;
 public class AddClient {
     public static void main(String[] args) {
         try {
-      /*
-      String addServerURL = "rmi://" + args[0] + "/AddServer";
-      AddServerIntf addServerIntf =
-                    (AddServerIntf)Naming.lookup(addServerURL);
-      */
             Scanner myObj = new Scanner(System.in);
             String temConta, email = "", password = "", passwordRepetida = "", opcao;
             int idUser = 0;
             boolean existeEmail = false;
 
-            final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
-            final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\SombrinhasDisp.txt";
-            final String reservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
+            final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\BaseDados\\UsernamePass.txt";
+            final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\BaseDados\\SombrinhasDisp.txt";
+            final String reservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\BaseDados\\reservas.txt";
 
             File fileUserPass = new File(pathUserPass);
             File fileSombrinhas = new File(pathsombrinhas);
@@ -173,134 +170,141 @@ public class AddClient {
 
             } while (!temConta.equals("n") && !temConta.equals("s"));
 
+            label:
             do {
                 System.out.println("\n" + "Escolha uma opção:" + "\n" + "R - Reservar uma sombrinha" + "\n" + "L - Listar sombrinhas não reservadas" + "\n" + "C - Cancelar uma sombrinha reservada" + "\n" + "S - Sair");
                 opcao = myObj.nextLine();
 
-                if (opcao.equals("R")) {
-                    int y = 1;
-                    String letra, hora, num;
-                    int hora_inicio = 0, num_pessoas = 0;
+                switch (opcao) {
+                    case "R": {
+                        int y = 1;
+                        String letra, hora, num;
+                        int hora_inicio = 0, num_pessoas = 0;
 
 
-                    do {
-                        System.out.println("Escolha a praia: (A, B ou C)");
-                        letra = myObj.nextLine();
+                        do {
+                            System.out.println("Escolha a praia: (A, B ou C)");
+                            letra = myObj.nextLine();
 
-                        if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
-                            System.out.println("Por favor, intrduza uma praia válida");
-                        }
-                    } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
-
-
-                    do {
-                        System.out.println("Escolha a hora de ínicio(8h - 20h)");
-                        hora = myObj.nextLine();
-
-
-                        if (!hora.matches("\\d+")) {
-                            System.out.println("Introduza uma hora válida");
-                        } else {
-                            hora_inicio = Integer.parseInt(hora);
-
-                            if (hora_inicio < 8 || hora_inicio > 20) {
-                                System.out.println("Por favor, introduza uma hora válida");
+                            if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
+                                System.out.println("Por favor, intrduza uma praia válida");
                             }
-                        }
+                        } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
 
-                    } while (hora_inicio < 8 || hora_inicio > 20);
 
-                    do {
-                        System.out.println("Escolha o número de pessoas (1-4)");
-                        num = myObj.nextLine();
+                        do {
+                            System.out.println("Escolha a hora de ínicio(8h - 20h)");
+                            hora = myObj.nextLine();
 
-                        if (!num.matches("\\d+")) {
-                            System.out.println("Introduza um número válido");
-                        } else {
-                            num_pessoas = Integer.parseInt(num);
 
-                            if (num_pessoas < 8 || num_pessoas > 20) {
-                                System.out.println("Por favor, introduza um numero válido");
+                            if (!hora.matches("\\d+")) {
+                                System.out.println("Introduza uma hora válida");
+                            } else {
+                                hora_inicio = Integer.parseInt(hora);
+
+                                if (hora_inicio < 8 || hora_inicio > 20) {
+                                    System.out.println("Por favor, introduza uma hora válida");
+                                }
                             }
 
-                        }
-                    } while (num_pessoas < 1 || num_pessoas > 4);
+                        } while (hora_inicio < 8 || hora_inicio > 20);
 
+                        do {
+                            System.out.println("Escolha o número de pessoas (1-4)");
+                            num = myObj.nextLine();
 
-                    if (num_pessoas <= 2) {
+                            if (!num.matches("\\d+")) {
+                                System.out.println("Introduza um número válido");
+                            } else {
+                                num_pessoas = Integer.parseInt(num);
 
-                    } else if (num_pessoas == 3) {
-
-                    } else if (num_pessoas == 4) {
-
-                    }
-
-
-                } else if (opcao.equals("L")) { //atrasado mental, lê o enunciado
-                    try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
-                        String linha;
-                        while ((linha = leitor.readLine()) != null) {
-                            String[] praias = linha.split(",");
-                            if (praias[2].equals("0")) {
-                                System.out.println(linha);
-                            }
-                        }
-                    }
-                } else if (opcao.equals("C")) { //ID,Hora,Praia,sombrinha numero
-
-                    String letra;
-
-                    do {
-                        System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
-                        letra = myObj.nextLine();
-
-                        if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
-                            System.out.println("Por favor, intrduza uma praia válida");
-                        }
-                    } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
-
-                    try (BufferedReader leitor = new BufferedReader(new FileReader(reservas))) {
-
-                        String linha;
-                        int linhaAtual = 0;
-                        boolean reserva = false;
-
-                        while ((linha = leitor.readLine()) != null) {
-
-                            String[] praias = linha.split(",");
-
-                            if (praias[0].equals(Integer.toString(idUser))) {
-
-                                reserva = true;
-
-                                try (BufferedWriter escritor = new BufferedWriter(new FileWriter(reservas, true))) {
-                                    //falta apagar as coisas do ficheiro
+                                if (num_pessoas < 8 || num_pessoas > 20) {
+                                    System.out.println("Por favor, introduza um numero válido");
                                 }
 
                             }
-                            linhaAtual++;
+                        } while (num_pessoas < 1 || num_pessoas > 4);
+
+
+                        if (num_pessoas <= 2) {
+
+                        } else if (num_pessoas == 3) {
+
+                        } else if (num_pessoas == 4) {
+
                         }
 
-                        if(!reserva){
-                            System.out.println("Reserva não encontrada");
-                        }
+
+                        break;
                     }
+                    case "L":  //atrasado mental, lê o enunciado
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
+                            String linha;
+                            while ((linha = leitor.readLine()) != null) {
+                                String[] praias = linha.split(",");
+                                if (praias[2].equals("0")) {
+                                    System.out.println(linha);
+                                }
+                            }
+                        }
+                        break;
+                    case "C": { //ID,Hora,Praia,sombrinha numero
+
+                        String letra;
+
+                        do {
+                            System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
+                            letra = myObj.nextLine();
+
+                            if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
+                                System.out.println("Por favor, intrduza uma praia válida");
+                            }
+                        } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(reservas))) {
+
+                            String linha;
+                            int linhaAtual = 0;
+                            boolean reserva = false;
+
+                            while ((linha = leitor.readLine()) != null) {
+
+                                String[] praias = linha.split(",");
+
+                                if (praias[0].equals(Integer.toString(idUser))) {
+
+                                    reserva = true;
+
+                                    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(reservas, true))) {
+                                        //falta apagar as coisas do ficheiro
+                                    }
+
+                                }
+                                linhaAtual++;
+                            }
+
+                            if (!reserva) {
+                                System.out.println("Reserva não encontrada");
+                            }
+                        }
 
 
-                } else if (opcao.equals("S")) {
-                    System.out.println("Obrigado! Até a proxima!");
-                    break;
+                        break;
+                    }
+                    case "S":
+                        System.out.println("Obrigado! Até a proxima!");
+                        break label;
 
-                } else {
-                    System.out.println("Opção incorreta, escolha uma opção válida");
+                    default:
+                        System.out.println("Opção incorreta, escolha uma opção válida");
+                        break;
                 }
 
             } while (true);
 
-
-            // System.out.println("The sum is: " + addServerIntf.add(1, 2));
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
+
     }
 }

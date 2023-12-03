@@ -1,3 +1,5 @@
+package ServerClient;
+
 import java.net.*;
 import java.rmi.*;
 public class AddServer {
