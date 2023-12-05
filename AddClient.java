@@ -10,7 +10,7 @@ public class AddClient {
     public static void main(String[] args) {
         try {
 
-            String addServerURL = "rmi://" + args[0] + "/AddServer";
+            String addServerURL = "rmi://" + "127.0.0.1" + "/AddServer";
             AddServerIntf addServerIntf =
                     (AddServerIntf) Naming.lookup(addServerURL);
 
@@ -38,10 +38,9 @@ public class AddClient {
 
                     System.out.println("Faça o registo.");
 
+                    Object[] server;
 
                     do {
-
-                        existeEmail = false;
 
                         System.out.println("Insira o seu email:");
                         email = myObj.nextLine();
@@ -56,11 +55,11 @@ public class AddClient {
                         System.out.println("Repita a sua password:");
                         passwordRepetida = myObj.nextLine();
 
-                        System.out.println(addServerIntf.registo(email, password, passwordRepetida, existeEmail, idUser));
+                        server = addServerIntf.registo(email, password, passwordRepetida, existeEmail, idUser);
 
-                        /**/
+                        System.out.println(server[1]);
 
-                    } while (!password.equals(passwordRepetida) || email.contains(",") || password.contains(",") || existeEmail);
+                    } while (!((boolean) server[0]));
 
 
                 }

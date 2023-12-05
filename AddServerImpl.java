@@ -13,7 +13,10 @@ public class AddServerImpl extends UnicastRemoteObject
         return d1 + d2;
     }
 
-    public String registo(String email, String password, String passwordRepetida, boolean existeEmail, int idUser) throws RemoteException, Error {
+    public Object[] registo(String email, String password, String passwordRepetida, boolean existeEmail, int idUser) throws RemoteException, Error {
+
+        Object[] returnObj = new Object[2];
+        returnObj[0] = (false);
 
         final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
         File fileUserPass = new File(pathUserPass);
@@ -39,19 +42,19 @@ public class AddServerImpl extends UnicastRemoteObject
 
         if (email.contains(",")) {
 
-            return ("Email não pode conter uma vígula.");
+            returnObj[1] = "Email não pode conter uma vígula.";
 
         } else if (existeEmail) {
+            returnObj[1] = ("Esse email já está registado, por favor faça o login" + "\n" + "Para fazer login, basta escrever ','");
 
-            return ("Esse email já está registado, por favor faça o login" + "\n" + "Para fazer login, basta escrever ','");
 
         } else if (password.contains(",")) {
 
-            return ("Password não pode conter uma vígula.");
+            returnObj[1] = ("Password não pode conter uma vígula.");
 
         } else if (!password.equals(passwordRepetida)) {
 
-            return ("Passwords não são iguais.");
+            returnObj[1] = ("Passwords não são iguais.");
 
         } else {
             String ultimoID = "";
@@ -81,8 +84,11 @@ public class AddServerImpl extends UnicastRemoteObject
                 throw new RuntimeException(e);
             }
 
-            return ("Registo feito com sucesso!");
+            returnObj[0] = (true);
+            returnObj[1] = ("Registo feito com sucesso!");
+
         }
+        return returnObj;
     }
 
 
