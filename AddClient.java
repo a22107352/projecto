@@ -93,115 +93,119 @@ public class AddClient {
 
             } while (!temConta.equals("n") && !temConta.equals("s"));
 
+            label:
             do {
                 System.out.println("\n" + "Escolha uma opção:" + "\n" + "R - Reservar uma sombrinha" + "\n" + "L - Listar sombrinhas não reservadas" + "\n" + "C - Cancelar uma sombrinha reservada" + "\n" + "S - Sair");
                 opcao = myObj.nextLine();
 
-                if (opcao.equals("R")) {
-                    int y = 1;
-                    String hora, num, letra;
+                switch (opcao) {
+                    case "R": {
+                        int y = 1;
+                        String hora, num, letra;
 
-                    int hora_inicio = 0, num_pessoas = 0;
+                        int hora_inicio = 0, num_pessoas = 0;
 
-                    Object[] returnObj_praia, returnObj_hora, returnObj_num;
-                    do {
-                        System.out.println("Escolha a praia: (A, B ou C)");
-                        letra = myObj.nextLine();
+                        Object[] returnObj_praia, returnObj_hora, returnObj_num;
+                        do {
+                            System.out.println("Escolha a praia: (A, B ou C)");
+                            letra = myObj.nextLine();
 
-                        returnObj_praia = addServerIntf.valida_escolha(letra);
-                        System.out.print(returnObj_praia[1]);
+                            returnObj_praia = addServerIntf.valida_escolha(letra);
+                            System.out.print(returnObj_praia[1]);
 
-                    } while (returnObj_praia[0].equals(false));
-
-
-                    do {
-
-                        System.out.println("Escolha a hora de ínicio(8h - 20h)");
-                        hora = myObj.nextLine();
-
-                        returnObj_hora = addServerIntf.valida_hora(hora);
-                        System.out.print(returnObj_hora[1]);
-
-                    } while (returnObj_hora[0].equals(false));
+                        } while (returnObj_praia[0].equals(false));
 
 
-                    do {
+                        do {
 
-                        System.out.println("Escolha o número de pessoas (1-4)");
-                        num = myObj.nextLine();
+                            System.out.println("Escolha a hora de ínicio(8h - 20h)");
+                            hora = myObj.nextLine();
 
-                        returnObj_num = addServerIntf.valida_num(num);
-                        System.out.print(returnObj_num[1]);
+                            returnObj_hora = addServerIntf.valida_hora(hora);
+                            System.out.print(returnObj_hora[1]);
 
-                    } while (returnObj_num[0].equals(false));
-                    System.out.println("correto");
+                        } while (returnObj_hora[0].equals(false));
 
-                    if (num_pessoas <= 2) {
 
-                    } else if (num_pessoas == 3) {
+                        do {
 
-                    } else if (num_pessoas == 4) {
+                            System.out.println("Escolha o número de pessoas (1-4)");
+                            num = myObj.nextLine();
 
+                            returnObj_num = addServerIntf.valida_num(num);
+                            System.out.print(returnObj_num[1]);
+
+                        } while (returnObj_num[0].equals(false));
+                        System.out.println("correto");
+
+                        //faz_reserva(letra,num,hora);
+
+                        
+
+
+                        break;
                     }
-
-
-                } else if (opcao.equals("L")) { //atrasado mental, lê o enunciado
-                    try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
-                        String linha;
-                        while ((linha = leitor.readLine()) != null) {
-                            String[] praias = linha.split(",");
-                            if (praias[2].equals("0")) {
-                                System.out.println(linha);
-                            }
-                        }
-                    }
-                } else if (opcao.equals("C")) { //esta a acontecer,ID,Hora,Praia,sombrinha numero
-
-                    String letra;
-
-                    do {
-                        System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
-                        letra = myObj.nextLine();
-
-                        if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
-                            System.out.println("Por favor, introduza uma praia válida");
-                        }
-                    } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
-
-                    try (BufferedReader leitor = new BufferedReader(new FileReader(reservas))) {
-
-                        String linha;
-                        int linhaAtual = 0;
-                        boolean reserva = false;
-
-                        while ((linha = leitor.readLine()) != null) {
-
-                            String[] praias = linha.split(",");
-
-                            if (praias[0].equals(Integer.toString(idUser))) {
-
-                                reserva = true;
-
-                                try (BufferedWriter escritor = new BufferedWriter(new FileWriter(reservas, true))) {
-                                    //falta apagar as coisas do ficheiro
+                    case "L":  //atrasado mental, lê o enunciado
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
+                            String linha;
+                            while ((linha = leitor.readLine()) != null) {
+                                String[] praias = linha.split(",");
+                                if (praias[2].equals("0")) {
+                                    System.out.println(linha);
                                 }
-
                             }
-                            linhaAtual++;
+                        }
+                        break;
+                    case "C": { //esta a acontecer,ID,Hora,Praia,sombrinha numero
+
+                        String letra;
+
+                        do {
+                            System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
+                            letra = myObj.nextLine();
+
+                            if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
+                                System.out.println("Por favor, introduza uma praia válida");
+                            }
+                        } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(reservas))) {
+
+                            String linha;
+                            int linhaAtual = 0;
+                            boolean reserva = false;
+
+                            while ((linha = leitor.readLine()) != null) {
+
+                                String[] praias = linha.split(",");
+
+                                if (praias[0].equals(Integer.toString(idUser))) {
+
+                                    reserva = true;
+
+                                    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(reservas, true))) {
+                                        //falta apagar as coisas do ficheiro
+                                    }
+
+                                }
+                                linhaAtual++;
+                            }
+
+                            if (!reserva) {
+                                System.out.println("Reserva não encontrada");
+                            }
                         }
 
-                        if (!reserva) {
-                            System.out.println("Reserva não encontrada");
-                        }
+
+                        break;
                     }
+                    case "S":
+                        System.out.println("Obrigado! Até a proxima!");
+                        break label;
 
-
-                } else if (opcao.equals("S")) {
-                    System.out.println("Obrigado! Até a proxima!");
-                    break;
-
-                } else {
-                    System.out.println("Opção incorreta, escolha uma opção válida");
+                    default:
+                        System.out.println("Opção incorreta, escolha uma opção válida");
+                        break;
                 }
 
             } while (true);

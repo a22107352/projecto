@@ -89,6 +89,7 @@ public class AddServerImpl extends UnicastRemoteObject
     public Object[] login(String email, String password) throws RemoteException {
 
         final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
+        final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
         boolean logado = false;
 
         Object[] returnObj = new Object[3];
@@ -185,11 +186,55 @@ public class AddServerImpl extends UnicastRemoteObject
             if (num_pessoas < 1 || num_pessoas > 4) {
                 returnObj_num[0] = false;
                 returnObj_num[1] = "Introduza um número válido\n";
-            }else{
+            } else {
                 returnObj_num[0] = true;
                 returnObj_num[1] = "";
             }
         }
         return returnObj_num;
     }
+    
+    /*public String faz_reserva (Str){
+    
+        
+            if(num < 3){
+                            try (BufferedReader leitor = new BufferedReader(new FileReader(pathReservas))) {
+
+                            String linha;
+
+                            while ((linha = leitor.readLine()) != null) {
+
+                                String[] userPass = linha.split(",");
+                                if (userPass[3].equals(letra)) {                                    
+
+                                        if(userPass[0] == 0) {
+                                            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass, true))) {
+                                            
+                                                            int id = Integer.parseInt(ultimoID);
+                                                            returnObj[2] = ++id;
+                                            
+                                                            escritor.write(id + "," + email + "," + password);
+                                                            escritor.newLine();
+                                                        } catch (IOException e) {
+                                                            throw new RuntimeException(e);
+            }
+                                                                                        
+                                        }else{
+                                            return "Sombra ocupada";
+                                        }
+                                }else{
+                                    //faz reserva
+                                }
+
+                            }
+
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+            }else if(num == 3){
+
+            }else{
+
+            }
+    }*/
 }
