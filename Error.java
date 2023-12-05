@@ -1,4 +1,4 @@
-
+/*
 public class Error extends Exception{
 
     private String message = "";
@@ -27,3 +27,4 @@ public class Error extends Exception{
     }
 
 }
+*/

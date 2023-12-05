@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,6 +27,7 @@ public class AddClient {
             File fileUserPass = new File(pathUserPass);
             File fileSombrinhas = new File(pathsombrinhas);
 
+            Object[] server;
 
             System.out.println("Bem vindo!");
 
@@ -37,8 +39,6 @@ public class AddClient {
                 if (temConta.equals("n")) {
 
                     System.out.println("Faça o registo.");
-
-                    Object[] server;
 
                     do {
 
@@ -56,7 +56,7 @@ public class AddClient {
                         passwordRepetida = myObj.nextLine();
 
                         server = addServerIntf.registo(email, password, passwordRepetida, existeEmail, idUser);
-
+                        idUser = (int) server[2];
                         System.out.println(server[1]);
 
                     } while (!((boolean) server[0]));
@@ -65,7 +65,7 @@ public class AddClient {
                 }
 
                 if (temConta.equals("s") || email.equals(",")) {
-                    boolean logado = false;
+
 
                     do {
                         System.out.println("Faça o login!");
@@ -76,33 +76,11 @@ public class AddClient {
                         System.out.println("Insira a sua password:");
                         password = myObj.nextLine();
 
-                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
+                        server = addServerIntf.login(email, password);
+                        idUser = (int) server[2];
+                        System.out.println(server[1]);
 
-                            String linha;
-
-                            while ((linha = leitor.readLine()) != null) {
-
-                                String[] userPass = linha.split(",");
-                                if (userPass[1].equals(email)) {
-
-                                    if (userPass[2].equals(password)) {
-                                        idUser = Integer.parseInt(userPass[0]);
-                                        logado = true;
-                                    }
-
-                                }
-
-                            }
-
-
-                            if (logado) {
-                                System.out.println("Login feito com sucesso!");
-                            } else {
-                                System.out.println("Credencias erradas!");
-                            }
-
-                        }
-                    } while (!logado);
+                    } while (!((boolean) server[0]));
 
 
                 }
@@ -121,53 +99,42 @@ public class AddClient {
 
                 if (opcao.equals("R")) {
                     int y = 1;
-                    String letra, hora, num;
+                    String hora, num, letra;
+
                     int hora_inicio = 0, num_pessoas = 0;
 
-
+                    Object[] returnObj_praia, returnObj_hora, returnObj_num;
                     do {
                         System.out.println("Escolha a praia: (A, B ou C)");
                         letra = myObj.nextLine();
 
-                        if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
-                            System.out.println("Por favor, intrduza uma praia válida");
-                        }
-                    } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+                        returnObj_praia = addServerIntf.valida_escolha(letra);
+                        System.out.print(returnObj_praia[1]);
+
+                    } while (returnObj_praia[0].equals(false));
 
 
                     do {
+
                         System.out.println("Escolha a hora de ínicio(8h - 20h)");
                         hora = myObj.nextLine();
 
+                        returnObj_hora = addServerIntf.valida_hora(hora);
+                        System.out.print(returnObj_hora[1]);
 
-                        if (!hora.matches("\\d+")) {
-                            System.out.println("Introduza uma hora válida");
-                        } else {
-                            hora_inicio = Integer.parseInt(hora);
+                    } while (returnObj_hora[0].equals(false));
 
-                            if (hora_inicio < 8 || hora_inicio > 20) {
-                                System.out.println("Por favor, introduza uma hora válida");
-                            }
-                        }
-
-                    } while (hora_inicio < 8 || hora_inicio > 20);
 
                     do {
+
                         System.out.println("Escolha o número de pessoas (1-4)");
                         num = myObj.nextLine();
 
-                        if (!num.matches("\\d+")) {
-                            System.out.println("Introduza um número válido");
-                        } else {
-                            num_pessoas = Integer.parseInt(num);
+                        returnObj_num = addServerIntf.valida_num(num);
+                        System.out.print(returnObj_num[1]);
 
-                            if (num_pessoas < 8 || num_pessoas > 20) {
-                                System.out.println("Por favor, introduza um numero válido");
-                            }
-
-                        }
-                    } while (num_pessoas < 1 || num_pessoas > 4);
-
+                    } while (returnObj_num[0].equals(false));
+                    System.out.println("correto");
 
                     if (num_pessoas <= 2) {
 
@@ -188,7 +155,7 @@ public class AddClient {
                             }
                         }
                     }
-                } else if (opcao.equals("C")) { //ID,Hora,Praia,sombrinha numero
+                } else if (opcao.equals("C")) { //esta a acontecer,ID,Hora,Praia,sombrinha numero
 
                     String letra;
 
@@ -197,7 +164,7 @@ public class AddClient {
                         letra = myObj.nextLine();
 
                         if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
-                            System.out.println("Por favor, intrduza uma praia válida");
+                            System.out.println("Por favor, introduza uma praia válida");
                         }
                     } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
 
