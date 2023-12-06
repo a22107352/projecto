@@ -1,5 +1,5 @@
 1,a,a
 2,y,y
 3,x,x
-4,tyty,tyty
-5,tytytytyty,tytyty
+4,q,q
+5,g,g
