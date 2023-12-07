@@ -6,4 +6,5 @@ public interface AddServerIntf extends Remote {
   public Object[] valida_hora(String hora) throws RemoteException;
   public Object[] valida_num(String num) throws RemoteException;
 
+  public Object[] func_C(String letra, int idUser) throws RemoteException;
 }

@@ -22,12 +22,15 @@ public class AddServerImpl extends UnicastRemoteObject
 
             while ((linha = leitor.readLine()) != null) {
 
-                String[] userPass = linha.split(",");
-                if (userPass[1].equals(email)) {
+                if(!linha.isEmpty()){
+                    String[] userPass = linha.split(",");
+                    if (userPass[1].equals(email)) {
 
-                    existeEmail = true;
+                        existeEmail = true;
 
+                    }
                 }
+
 
             }
 
@@ -101,15 +104,18 @@ public class AddServerImpl extends UnicastRemoteObject
 
             while ((linha = leitor.readLine()) != null) {
 
-                String[] userPass = linha.split(",");
-                if (userPass[1].equals(email)) {
+                if(!linha.isEmpty()){
+                    String[] userPass = linha.split(",");
+                    if (userPass[1].equals(email)) {
 
-                    if (userPass[2].equals(password)) {
-                        returnObj[2] = Integer.parseInt(userPass[0]);
-                        logado = true;
+                        if (userPass[2].equals(password)) {
+                            returnObj[2] = Integer.parseInt(userPass[0]);
+                            logado = true;
+                        }
+
                     }
-
                 }
+
 
             }
 
@@ -120,6 +126,7 @@ public class AddServerImpl extends UnicastRemoteObject
             } else {
                 returnObj[0] = (false);
                 returnObj[1] = ("Credencias erradas!");
+                returnObj[2] = 1;
             }
 
         } catch (IOException e) {
@@ -130,7 +137,7 @@ public class AddServerImpl extends UnicastRemoteObject
     }
 
 
-    public Object[] valida_escolha(String letra) {
+    public Object[] valida_escolha(String letra)throws RemoteException {
 
         Object[] returnObj = new Object[2];
 
@@ -149,7 +156,7 @@ public class AddServerImpl extends UnicastRemoteObject
     }
 
 
-    public Object[] valida_hora(String hora) {
+    public Object[] valida_hora(String hora)throws RemoteException {
 
         Object[] returnObj_hora = new Object[2];
         int hora_inicio;
@@ -172,7 +179,7 @@ public class AddServerImpl extends UnicastRemoteObject
     }
 
 
-    public Object[] valida_num(String num) {
+    public Object[] valida_num(String num) throws RemoteException {
 
         Object[] returnObj_num = new Object[2];
         int num_pessoas;
@@ -237,4 +244,59 @@ public class AddServerImpl extends UnicastRemoteObject
 
             }
     }*/
+
+    public Object[] func_C(String letra, int idUser) throws RemoteException {
+
+        final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
+        File fileReservas = new File(pathReservas);
+
+        Object[] returnObj = new Object[2];
+
+        try (BufferedReader leitor = new BufferedReader(new FileReader(fileReservas))) {
+
+            String linha;
+            int linhaAtual = 0;
+            boolean reserva = false;
+            StringBuilder conteudo = new StringBuilder();
+
+            while ((linha = leitor.readLine()) != null) {
+
+                String[] praias = linha.split(",");
+
+                if (letra.equals(praias[3]) && praias[1].equals(Integer.toString(idUser)) && Integer.parseInt(praias[0]) == 1) {
+
+                    reserva = true;
+
+                    linha = "";
+
+                    linhaAtual--;
+                } else {
+                    if (linhaAtual != 0) {
+                        conteudo.append("\n");
+                    }
+
+                }
+                conteudo.append(linha);
+                linhaAtual++;
+            }
+
+            if (!reserva) {
+                returnObj[0] = (false);
+                returnObj[1] = ("Reserva não encontrada");
+            } else {
+
+                try (PrintWriter writer = new PrintWriter(fileReservas)) {
+                    writer.write(conteudo.toString());
+                } catch (FileNotFoundException ignored) {
+                }
+                returnObj[0] = (true);
+                returnObj[1] = ("Reserva cancelada com sucesso");
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return returnObj;
+    }
 }

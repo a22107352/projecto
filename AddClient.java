@@ -22,10 +22,11 @@ public class AddClient {
 
             final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
             final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\SombrinhasDisp.txt";
-            final String reservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
+            final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
 
             File fileUserPass = new File(pathUserPass);
             File fileSombrinhas = new File(pathsombrinhas);
+            File fileReservas = new File(pathReservas);
 
             Object[] server;
 
@@ -140,8 +141,6 @@ public class AddClient {
 
                         //faz_reserva(letra,num,hora);
 
-                        
-
 
                         break;
                     }
@@ -160,41 +159,20 @@ public class AddClient {
 
                         String letra;
 
+                        Object[] returnObj_praia, returnObj_final;
+
                         do {
-                            System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
+                            System.out.println("Escolha a praia: (A, B ou C)");
                             letra = myObj.nextLine();
 
-                            if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
-                                System.out.println("Por favor, introduza uma praia válida");
-                            }
-                        } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+                            returnObj_praia = addServerIntf.valida_escolha(letra);
+                            System.out.print(returnObj_praia[1]);
 
-                        try (BufferedReader leitor = new BufferedReader(new FileReader(reservas))) {
+                        } while (returnObj_praia[0].equals(false));
 
-                            String linha;
-                            int linhaAtual = 0;
-                            boolean reserva = false;
+                        returnObj_final = addServerIntf.func_C(letra, idUser);
 
-                            while ((linha = leitor.readLine()) != null) {
-
-                                String[] praias = linha.split(",");
-
-                                if (praias[0].equals(Integer.toString(idUser))) {
-
-                                    reserva = true;
-
-                                    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(reservas, true))) {
-                                        //falta apagar as coisas do ficheiro
-                                    }
-
-                                }
-                                linhaAtual++;
-                            }
-
-                            if (!reserva) {
-                                System.out.println("Reserva não encontrada");
-                            }
-                        }
+                        System.out.println(returnObj_final[1]);
 
 
                         break;
