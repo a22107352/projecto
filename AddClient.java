@@ -144,12 +144,20 @@ public class AddClient {
 
                         break;
                     }
-                    case "L":  //atrasado mental, lê o enunciado
+                    case "L":
                         try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
                             String linha;
+                            String praia;
+                            do{
+                                System.out.println("Escolha a praia: (A, B ou C)");
+                                praia = myObj.nextLine();
+
+                            }while(praia!="C"||praia!="B"||praia!="A");
+
                             while ((linha = leitor.readLine()) != null) {
                                 String[] praias = linha.split(",");
-                                if (praias[2].equals("0")) {
+                                if (praias[0].equals(praia)&& praias[2].equals("0")) {
+
                                     System.out.println(linha);
                                 }
                             }
