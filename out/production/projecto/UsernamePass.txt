@@ -3,3 +3,7 @@
 3,x,x
 4,q,q
 5,g,g
+6,A,a
+7,ty,ty
+8,yuyu,yuyu
+9,t,t

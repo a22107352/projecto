@@ -1,0 +1,4 @@
+rmiregistry(1 janela)
+javac AddClient.java AddServer.java AddServerImpl.java AddServerIntf.java (1 janela)
+java AddServer.java (mesma cima)
+java AddClient 127.0.0.1 2 3(1 janela)
