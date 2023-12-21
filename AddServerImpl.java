@@ -1,143 +1,19 @@
 import java.io.*;
 import java.rmi.*;
 import java.rmi.server.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddServerImpl extends UnicastRemoteObject
         implements AddServerIntf {
 
     public AddServerImpl() throws RemoteException {
     }
+    final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
 
-    public Object[] registo(String email, String password, String passwordRepetida, boolean existeEmail, int idUser) throws RemoteException {
+    File fileReservas = new File(pathReservas);
 
-        Object[] returnObj = new Object[3];
-        returnObj[0] = (false);
-
-        final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
-        File fileUserPass = new File(pathUserPass);
-
-        try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
-
-            String linha;
-
-            while ((linha = leitor.readLine()) != null) {
-
-                if(!linha.isEmpty()){
-                    String[] userPass = linha.split(",");
-                    if (userPass[1].equals(email)) {
-
-                        existeEmail = true;
-
-                    }
-                }
-
-
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (email.contains(",")) {
-
-            returnObj[1] = "Email não pode conter uma vígula.";
-
-        } else if (existeEmail) {
-            returnObj[1] = ("Esse email já está registado, por favor faça o login" + "\n" + "Para fazer login, basta escrever ','");
-
-
-        } else if (password.contains(",")) {
-
-            returnObj[1] = ("Password não pode conter uma vígula.");
-
-        } else if (!password.equals(passwordRepetida)) {
-
-            returnObj[1] = ("Passwords não são iguais.");
-
-        } else {
-            String ultimoID = "";
-
-            try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
-
-                String linha;
-
-                while ((linha = leitor.readLine()) != null) {
-
-                    String[] userPass = linha.split(",");
-                    ultimoID = userPass[0];
-
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass, true))) {
-
-                int id = Integer.parseInt(ultimoID);
-                returnObj[2] = ++id;
-
-                escritor.write(id + "," + email + "," + password);
-                escritor.newLine();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            returnObj[0] = (true);
-            returnObj[1] = ("Registo feito com sucesso!");
-
-        }
-        return returnObj;
-    }
-
-    public Object[] login(String email, String password) throws RemoteException {
-
-        final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
-        final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
-        boolean logado = false;
-
-        Object[] returnObj = new Object[3];
-
-
-        try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
-
-            String linha;
-
-            while ((linha = leitor.readLine()) != null) {
-
-                if(!linha.isEmpty()){
-                    String[] userPass = linha.split(",");
-                    if (userPass[1].equals(email)) {
-
-                        if (userPass[2].equals(password)) {
-                            returnObj[2] = Integer.parseInt(userPass[0]);
-                            logado = true;
-                        }
-
-                    }
-                }
-
-
-            }
-
-
-            if (logado) {
-                returnObj[0] = (true);
-                returnObj[1] = ("Login feito com sucesso!");
-            } else {
-                returnObj[0] = (false);
-                returnObj[1] = ("Credencias erradas!");
-                returnObj[2] = 1;
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return returnObj;
-    }
-
-
-    public Object[] valida_escolha(String letra)throws RemoteException {
+    public Object[] valida_praia(String letra)throws RemoteException {
 
         Object[] returnObj = new Object[2];
 
@@ -200,55 +76,84 @@ public class AddServerImpl extends UnicastRemoteObject
         }
         return returnObj_num;
     }
-    
-    /*public String faz_reserva (Str){
-    
-        
-            if(num < 3){
-                            try (BufferedReader leitor = new BufferedReader(new FileReader(pathReservas))) {
 
-                            String linha;
 
-                            while ((linha = leitor.readLine()) != null) {
+    public Object[] funcReservar(String letra, int idUser, String hora, int num_pessoas) throws RemoteException {
 
-                                String[] userPass = linha.split(",");
-                                if (userPass[3].equals(letra)) {                                    
+        Object[] returnObj = new Object[2];
 
-                                        if(userPass[0] == 0) {
-                                            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass, true))) {
-                                            
-                                                            int id = Integer.parseInt(ultimoID);
-                                                            returnObj[2] = ++id;
-                                            
-                                                            escritor.write(id + "," + email + "," + password);
-                                                            escritor.newLine();
-                                                        } catch (IOException e) {
-                                                            throw new RuntimeException(e);
+        boolean reserva = false;
+
+
+        try (BufferedReader leitor = new BufferedReader(new FileReader(pathReservas))) {//praia,id sombrinha,hora,n pessoas,iduser reservou, reservado
+            List<String> linhas = new ArrayList<>();
+
+            String linha;
+            while ((linha = leitor.readLine()) != null) {
+                String[] praias = linha.split(",");
+
+                if (praias[0].equals(letra) && praias[2].equals(hora) && num_pessoas <= Integer.parseInt(praias[3]) && praias[5].equals("0") && !reserva) {
+                    praias[praias.length - 1] = "1";
+                    praias[praias.length - 2] = String.valueOf(idUser);
+                    reserva = true;
+                }
+                linhas.add(String.join(",", praias));
             }
-                                                                                        
-                                        }else{
-                                            return "Sombra ocupada";
-                                        }
-                                }else{
-                                    //faz reserva
-                                }
 
-                            }
+            if (reserva) {
+                returnObj[0] = (true);
+                returnObj[1] = ("Reserva feito com sucesso.");
 
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-            }else if(num == 3){
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileReservas))) {
+                    for (String linhaAtualizada : linhas) {
+                        bw.write(linhaAtualizada);
+                        bw.newLine();
+                    }
+                }
 
-            }else{
-
+            } else {
+                returnObj[0] = (false);
+                returnObj[1] = ("Praia não disponivel.");
             }
-    }*/
 
-    public Object[] func_C(String letra, int idUser) throws RemoteException {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
-        File fileReservas = new File(pathReservas);
+        return returnObj;
+    }
+
+
+    public Object[] funcListar(String letra, int idUser, String hora) throws RemoteException {
+
+        Object[] returnObj = new Object[2];
+
+        try (BufferedReader leitorReservas = new BufferedReader(new FileReader(pathReservas))) {
+
+            boolean ocupado = false;
+            String linha;
+            while ((linha = leitorReservas.readLine()) != null) {
+                String[] reservas = linha.split(",");
+                if (reservas[5].equals(Integer.toString(1)) && reservas[0].equals(letra) && String.valueOf(reservas[2]).equals(hora)) {
+                    ocupado = true;
+                }
+            }
+
+            if (ocupado) {
+                returnObj[0] = (false);
+                returnObj[1] = ("Sombrinha ocupada.");
+            } else {
+                returnObj[0] = (true);
+                returnObj[1] = ("Sombrinha disponivel.");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return returnObj;
+    }
+
+    public Object[] funcCancelar(String letra, int idUser) throws RemoteException {
 
         Object[] returnObj = new Object[2];
 

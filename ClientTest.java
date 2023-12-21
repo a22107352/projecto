@@ -2,6 +2,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -15,11 +17,9 @@ public class ClientTest {
             boolean existeEmail = false;
 
             final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
-            final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\SombrinhasDisp.txt";
             final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
 
             File fileUserPass = new File(pathUserPass);
-            File fileSombrinhas = new File(pathsombrinhas);
             File fileReservas = new File(pathReservas);
 
 
@@ -171,12 +171,18 @@ public class ClientTest {
 
             label:
             do {
-                System.out.println("\n" + "Escolha uma opção:" + "\n" + "R - Reservar uma sombrinha" + "\n" + "L - Listar sombrinhas não reservadas" + "\n" + "C - Cancelar uma sombrinha reservada" + "\n" + "S - Sair");
+                System.out.println("""
+
+                        Escolha uma opção:
+                        R - Reservar uma sombrinha
+                        L - Listar sombrinhas não reservadas
+                        C - Cancelar uma sombrinha reservada
+                        S - Sair""");
                 opcao = myObj.nextLine();
 
-                switch (opcao) {
+
+                switch (opcao) {//praia,id sombrinha,hora,n pessoas,iduser reservou, reservado
                     case "R": {
-                        int y = 1;
                         String letra, hora, num;
                         int hora_inicio = 0, num_pessoas = 0;
 
@@ -192,7 +198,7 @@ public class ClientTest {
 
 
                         do {
-                            System.out.println("Escolha a hora de ínicio(8h - 20h)");
+                            System.out.println("Escolha a hora de ínicio: (8h - 19h)");
                             hora = myObj.nextLine();
 
 
@@ -208,8 +214,9 @@ public class ClientTest {
 
                         } while (hora_inicio < 8 || hora_inicio > 20);
 
+
                         do {
-                            System.out.println("Escolha o número de pessoas (1-4)");
+                            System.out.println("Escolha o número de pessoas: (1-4)");
                             num = myObj.nextLine();
 
                             if (!num.matches("\\d+")) {
@@ -217,31 +224,51 @@ public class ClientTest {
                             } else {
                                 num_pessoas = Integer.parseInt(num);
 
-                                if (num_pessoas < 8 || num_pessoas > 20) {
+                                if (num_pessoas < 1 || num_pessoas > 4) {
                                     System.out.println("Por favor, introduza um numero válido");
                                 }
 
                             }
                         } while (num_pessoas < 1 || num_pessoas > 4);
 
+                        int reserva = 0;
 
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathReservas))) {//praia,id sombrinha,hora,n pessoas,iduser reservou, reservado
+                            List<String> linhas = new ArrayList<>();
 
-                        break;
-                    }
-                    case "L":  //atrasado mental, lê o enunciado
-                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
                             String linha;
                             while ((linha = leitor.readLine()) != null) {
                                 String[] praias = linha.split(",");
-                                if (praias[2].equals("0")) {
-                                    System.out.println(linha);
+
+                                if (praias[0].equals(letra) && praias[2].equals(hora) && num_pessoas <= Integer.parseInt(praias[3]) && praias[5].equals("0") && reserva == 0) {
+                                    praias[praias.length - 1] = "1";
+                                    praias[praias.length - 2] = String.valueOf(idUser);
+                                    reserva = 1;
+                                }
+                                linhas.add(String.join(",", praias));
+                            }
+
+                            if (reserva == 1) {
+                                System.out.println("Reserva feito com sucesso.");
+                            } else {
+                                System.out.println("Praia nao disponivel");
+                            }
+
+                            try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileReservas))) {
+                                for (String linhaAtualizada : linhas) {
+                                    bw.write(linhaAtualizada);
+                                    bw.newLine();
                                 }
                             }
                         }
-                    break;
-                    case "C": { //ID,Hora,Praia,sombrinha numero
 
-                        String letra;
+                        break;
+                    }
+                    case "L": {
+                        String linha;
+
+                        String letra, hora;
+                        int hora_inicio = 0;
 
                         do {
                             System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
@@ -251,6 +278,74 @@ public class ClientTest {
                                 System.out.println("Por favor, introduza uma praia válida");
                             }
                         } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+
+                        do {
+                            System.out.println("Escolha a hora de ínicio: (8h - 19h)");
+                            hora = myObj.nextLine();
+
+
+                            if (!hora.matches("\\d+")) {
+                                System.out.println("Introduza uma hora válida");
+                            } else {
+                                hora_inicio = Integer.parseInt(hora);
+
+                                if (hora_inicio < 8 || hora_inicio > 20) {
+                                    System.out.println("Por favor, introduza uma hora válida");
+                                }
+                            }
+
+                        } while (hora_inicio < 8 || hora_inicio > 20);
+
+                        try (BufferedReader leitorReservas = new BufferedReader(new FileReader(pathReservas))) {
+
+                            boolean ocupado = false;
+
+                            while ((linha = leitorReservas.readLine()) != null) {
+                                String[] reservas = linha.split(",");
+                                if (reservas[5].equals(Integer.toString(1)) && reservas[0].equals(letra) && String.valueOf(reservas[2]).equals(hora)) {
+                                    ocupado = true;
+                                }
+                            }
+
+                            if (ocupado) {
+                                System.out.println("Sombrinha ocupada");
+                            } else {
+                                System.out.println("Sombrinha disponivel");
+                            }
+                        }
+                    }
+
+                    break;
+                    case "C": {
+
+                        String letra, hora;
+                        int hora_inicio = 0;
+
+                        do {
+                            System.out.println("Escolha a praia que têm reserva: (A, B ou C)");
+                            letra = myObj.nextLine();
+
+                            if (!letra.equals("A") && !letra.equals("B") && !letra.equals("C")) {
+                                System.out.println("Por favor, introduza uma praia válida");
+                            }
+                        } while (!letra.equals("A") && !letra.equals("B") && !letra.equals("C"));
+
+                        do {
+                            System.out.println("Escolha a hora de ínicio: (8h - 19h)");
+                            hora = myObj.nextLine();
+
+
+                            if (!hora.matches("\\d+")) {
+                                System.out.println("Introduza uma hora válida");
+                            } else {
+                                hora_inicio = Integer.parseInt(hora);
+
+                                if (hora_inicio < 8 || hora_inicio > 20) {
+                                    System.out.println("Por favor, introduza uma hora válida");
+                                }
+                            }
+
+                        } while (hora_inicio < 8 || hora_inicio > 20);
 
                         try (BufferedReader leitor = new BufferedReader(new FileReader(fileReservas))) {
 
@@ -263,15 +358,15 @@ public class ClientTest {
 
                                 String[] praias = linha.split(",");
 
-                                if (letra.equals(praias[2]) && praias[0].equals(Integer.toString(idUser))) {
+                                if (letra.equals(praias[0]) && praias[4].equals(Integer.toString(idUser)) && praias[2].equals(Integer.toString(hora_inicio))) {
 
                                     reserva = true;
 
-                                    linha = "";
+                                    linha = "\n" + praias[0] + "," + praias[1] + "," + praias[2] + "," + praias[3] + ",0,0";
 
                                     linhaAtual--;
-                                }else{
-                                    if(linhaAtual!=0){
+                                } else {
+                                    if (linhaAtual != 0) {
                                         conteudo.append("\n");
                                     }
 
@@ -282,7 +377,7 @@ public class ClientTest {
 
                             if (!reserva) {
                                 System.out.println("Reserva não encontrada");
-                            }else{
+                            } else {
 
                                 try (PrintWriter writer = new PrintWriter(fileReservas)) {
                                     writer.write(conteudo.toString());
@@ -292,10 +387,7 @@ public class ClientTest {
 
                                 System.out.println("Reserva cancelada com sucesso");
                             }
-
                         }
-
-
                         break;
                     }
                     case "S":

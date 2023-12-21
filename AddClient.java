@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 public class AddClient {
     public static void main(String[] args) {
         try {
-
+            //127.0.0.1 ip windows
+            //192.168.56.101 linux windows
             String addServerURL = "rmi://" + "127.0.0.1" + "/AddServer";
             AddServerIntf addServerIntf =
                     (AddServerIntf) Naming.lookup(addServerURL);
@@ -21,14 +22,8 @@ public class AddClient {
             boolean existeEmail = false;
 
             final String pathUserPass = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\UsernamePass.txt";
-            final String pathsombrinhas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\SombrinhasDisp.txt";
-            final String pathReservas = "C:\\Users\\filip\\OneDrive\\Documentos\\Faculdade\\3º ano\\1º Semestre\\Computação distribuida\\projecto\\reservas.txt";
 
             File fileUserPass = new File(pathUserPass);
-            File fileSombrinhas = new File(pathsombrinhas);
-            File fileReservas = new File(pathReservas);
-
-            Object[] server;
 
             System.out.println("Bem vindo!");
 
@@ -41,7 +36,10 @@ public class AddClient {
 
                     System.out.println("Faça o registo.");
 
+
                     do {
+
+                        existeEmail = false;
 
                         System.out.println("Insira o seu email:");
                         email = myObj.nextLine();
@@ -56,17 +54,74 @@ public class AddClient {
                         System.out.println("Repita a sua password:");
                         passwordRepetida = myObj.nextLine();
 
-                        server = addServerIntf.registo(email, password, passwordRepetida, existeEmail, idUser);
-                        idUser = (int) server[2];
-                        System.out.println(server[1]);
 
-                    } while (!((boolean) server[0]));
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
+
+                            String linha;
+
+                            while ((linha = leitor.readLine()) != null) {
+
+                                String[] userPass = linha.split(",");
+                                if (userPass[1].equals(email)) {
+
+                                    existeEmail = true;
+
+                                }
+
+                            }
+
+                        }
+
+                        if (email.contains(",")) {
+
+                            System.out.println("Email não pode conter uma vígula.");
+
+                        } else if (existeEmail) {
+
+                            System.out.println("Esse email já está registado, por favor faça o login" + "\n" + "Para fazer login, basta escrever ','");
+
+                        } else if (password.contains(",")) {
+
+                            System.out.println("Password não pode conter uma vígula.");
+
+                        } else if (!password.equals(passwordRepetida)) {
+
+                            System.out.println("Passwords não são iguais.");
+
+                        } else {
+                            String ultimoID = "";
+
+                            try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
+
+                                String linha;
+
+                                while ((linha = leitor.readLine()) != null) {
+
+                                    String[] userPass = linha.split(",");
+                                    ultimoID = userPass[0];
+
+                                }
+                            }
+
+                            try (BufferedWriter escritor = new BufferedWriter(new FileWriter(fileUserPass, true))) {
+
+                                int id = Integer.parseInt(ultimoID);
+                                idUser = ++id;
+
+                                escritor.write(id + "," + email + "," + password);
+                                escritor.newLine();
+                            }
+
+                            System.out.println("Registo feito com sucesso!");
+                        }
+
+                    } while (!password.equals(passwordRepetida) || email.contains(",") || password.contains(",") || existeEmail);
 
 
                 }
 
                 if (temConta.equals("s") || email.equals(",")) {
-
+                    boolean logado = false;
 
                     do {
                         System.out.println("Faça o login!");
@@ -77,11 +132,32 @@ public class AddClient {
                         System.out.println("Insira a sua password:");
                         password = myObj.nextLine();
 
-                        server = addServerIntf.login(email, password);
-                        idUser = (int) server[2];
-                        System.out.println(server[1]);
+                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathUserPass))) {
 
-                    } while (!((boolean) server[0]));
+                            String linha;
+
+                            while ((linha = leitor.readLine()) != null) {
+
+                                String[] userPass = linha.split(",");
+                                if (userPass[1].equals(email)) {
+
+                                    if (userPass[2].equals(password)) {
+                                        idUser = Integer.parseInt(userPass[0]);
+                                        logado = true;
+                                    }
+
+                                }
+
+                            }
+
+                            if (logado) {
+                                System.out.println("Login feito com sucesso!");
+                            } else {
+                                System.out.println("Credencias erradas!");
+                            }
+
+                        }
+                    } while (!logado);
 
 
                 }
@@ -99,34 +175,33 @@ public class AddClient {
                 System.out.println("\n" + "Escolha uma opção:" + "\n" + "R - Reservar uma sombrinha" + "\n" + "L - Listar sombrinhas não reservadas" + "\n" + "C - Cancelar uma sombrinha reservada" + "\n" + "S - Sair");
                 opcao = myObj.nextLine();
 
-                switch (opcao) {
+                switch (opcao) { //praia,id sombrinha,hora,n pessoas,iduser reservou, reservado
                     case "R": {
-                        int y = 1;
+
                         String hora, num, letra;
 
-                        int hora_inicio = 0, num_pessoas = 0;
+                        int num_pessoas = 0;
 
-                        Object[] returnObj_praia, returnObj_hora, returnObj_num;
+                        Object[] returnObj_praia, returnObj_hora, returnObj_num, returnObj_final;
+
                         do {
                             System.out.println("Escolha a praia: (A, B ou C)");
                             letra = myObj.nextLine();
 
-                            returnObj_praia = addServerIntf.valida_escolha(letra);
+                            returnObj_praia = addServerIntf.valida_praia(letra);
                             System.out.print(returnObj_praia[1]);
 
                         } while (returnObj_praia[0].equals(false));
 
-
                         do {
 
-                            System.out.println("Escolha a hora de ínicio(8h - 20h)");
+                            System.out.println("Escolha a hora de ínicio(8h - 19h)");
                             hora = myObj.nextLine();
 
                             returnObj_hora = addServerIntf.valida_hora(hora);
                             System.out.print(returnObj_hora[1]);
 
                         } while (returnObj_hora[0].equals(false));
-
 
                         do {
 
@@ -137,33 +212,45 @@ public class AddClient {
                             System.out.print(returnObj_num[1]);
 
                         } while (returnObj_num[0].equals(false));
-                        System.out.println("correto");
 
-                        //faz_reserva(letra,num,hora);
+                        returnObj_final = addServerIntf.funcReservar(letra, idUser, hora, num_pessoas);
 
+                        System.out.println(returnObj_final[1]);
 
                         break;
                     }
-                    case "L":
-                        try (BufferedReader leitor = new BufferedReader(new FileReader(pathsombrinhas))) {
-                            String linha;
-                            String praia;
-                            do{
-                                System.out.println("Escolha a praia: (A, B ou C)");
-                                praia = myObj.nextLine();
+                    case "L": { //praia,id sombrinha,hora,n pessoas,iduser reservou, reservado
 
-                            }while(praia!="C"||praia!="B"||praia!="A");
+                        String hora, letra;
 
-                            while ((linha = leitor.readLine()) != null) {
-                                String[] praias = linha.split(",");
-                                if (praias[0].equals(praia)&& praias[2].equals("0")) {
+                        Object[] returnObj_praia, returnObj_hora, returnObj_final;
 
-                                    System.out.println(linha);
-                                }
-                            }
-                        }
-                        break;
-                    case "C": { //esta a acontecer,ID,Hora,Praia,sombrinha numero
+                        do {
+                            System.out.println("Escolha a praia: (A, B ou C)");
+                            letra = myObj.nextLine();
+
+                            returnObj_praia = addServerIntf.valida_praia(letra);
+                            System.out.print(returnObj_praia[1]);
+
+                        } while (returnObj_praia[0].equals(false));
+
+                        do {
+
+                            System.out.println("Escolha a hora de ínicio(8h - 19h)");
+                            hora = myObj.nextLine();
+
+                            returnObj_hora = addServerIntf.valida_hora(hora);
+                            System.out.print(returnObj_hora[1]);
+
+                        } while (returnObj_hora[0].equals(false));
+
+                        returnObj_final = addServerIntf.funcListar(letra, idUser, hora);
+
+                        System.out.println(returnObj_final[1]);
+
+                    }
+                    break;
+                    case "C": { //praia,id sombrinha,hora,n pessoas,iduser reservou, reservado
 
                         String letra;
 
@@ -173,15 +260,14 @@ public class AddClient {
                             System.out.println("Escolha a praia: (A, B ou C)");
                             letra = myObj.nextLine();
 
-                            returnObj_praia = addServerIntf.valida_escolha(letra);
+                            returnObj_praia = addServerIntf.valida_praia(letra);
                             System.out.print(returnObj_praia[1]);
 
                         } while (returnObj_praia[0].equals(false));
 
-                        returnObj_final = addServerIntf.func_C(letra, idUser);
+                        returnObj_final = addServerIntf.funcCancelar(letra, idUser);
 
                         System.out.println(returnObj_final[1]);
-
 
                         break;
                     }
